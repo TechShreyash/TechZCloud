@@ -5,7 +5,7 @@ from utils.file import allowed_file
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 1024 * 1024 * 1024  # 1 GB
-app.config["UPLOAD_FOLDER"] = "uploads"
+app.config["UPLOAD_FOLDER"] = "static/uploads"
 
 
 @app.errorhandler(413)
@@ -15,8 +15,8 @@ def too_large(e):
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
-    if "media" in request.files:
-        file = request.files["media"]
+    if "file" in request.files:
+        file = request.files["file"]
         if not file:
             return "No file uploaded", 400
 
@@ -30,7 +30,13 @@ def upload_file():
             except Exception as e:
                 return f"Error saving file: {str(e)}", 500
 
-            return "File uploaded successfully"
+            return jsonify(
+                {
+                    "htmlresponse": render_template(
+                        "response.html", msg="uploaded", filenameimage=filename
+                    )
+                }
+            )
         else:
             return "File type not allowed", 400
 
