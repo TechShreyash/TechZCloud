@@ -1,4 +1,4 @@
-from flask import request, Flask, render_template, make_response, jsonify
+from flask import request, Flask, render_template, make_response, jsonify, redirect
 from werkzeug.utils import secure_filename
 import os
 from utils.file import allowed_file
@@ -30,13 +30,7 @@ def upload_file():
             except Exception as e:
                 return f"Error saving file: {str(e)}", 500
 
-            return jsonify(
-                {
-                    "htmlresponse": render_template(
-                        "response.html", msg="uploaded", filenameimage=filename
-                    )
-                }
-            )
+            return redirect("/static/uploads/" + filename)
         else:
             return "File type not allowed", 400
 
