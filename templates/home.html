@@ -95,7 +95,7 @@
         function formatTime(sec_num) {
             const hours = Math.floor(sec_num / 3600);
             const minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-            const seconds = sec_num - (hours * 3600) - (minutes * 60);
+            const seconds = Math.floor(sec_num - (hours * 3600) - (minutes * 60));
 
             let text = ''
             if (hours > 0) {
@@ -163,9 +163,17 @@
 
                                 done = e.loaded
                             }
+                            console.log(e.loaded / e.total)
                         }
+
                     };
                     xhr.send(formData);
+
+                    xhr.onerror = e => {
+                        udiv1.style.display = "flex";
+                        udiv2.style.display = "none";
+                        alert('Error! Upload failed. Can\'t connect to server.');
+                    };
                 }
                 else {
                     alert('Select a file first');
