@@ -86,6 +86,6 @@ if __name__ == "__main__":
         bot_token="6135734682:AAGtmEzHCQfq2VbDtQnXfPUDuq2PcKPw8ZM",
     )
     bot.start()
-    threading.Thread(target=app.run, daemon=True).start()
+    threading.Thread(target=app.run, daemon=True,kwargs={'host':'0.0.0.0'}).start()
     idle()
     bot.stop()
