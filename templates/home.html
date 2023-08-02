@@ -209,8 +209,9 @@
 
                                             if (data['message']) {
                                                 isProc = false
-                                                clearInterval(interval);
                                                 console.log(data['message'])
+                                                alert('File uploaded successfully! https://t.me/TechZCloud/' + data['message'])
+                                                return
                                             }
                                             const current = data['current']
                                             const total = data['total']
@@ -239,7 +240,6 @@
 
                                 }
                                 else {
-                                    clearInterval(interval);
                                     console.log('done')
                                 }
                                 setTimeout(updateProcess, 5000);

@@ -1,6 +1,7 @@
 import threading
 from pyrogram import Client
 import time
+import os
 
 PROGRESS = {}
 
@@ -31,6 +32,8 @@ def upload_file_to_channel(app: Client, hash, filename, extension):
         progress_args=(hash,),
     )
     PROGRESS[hash]["message"] = file.id
+    print("Uploaded file to channel")
+    os.remove(f"static/uploads/{hash}.{extension}")
 
 
 def upload_progress(current, total, hash):
