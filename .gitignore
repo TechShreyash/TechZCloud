@@ -1,0 +1,4 @@
+
+*.pyc
+*.session
+*.session-journal

@@ -23,7 +23,7 @@
         <div class="container container-fluid">
             <a class="navbar-brand d-flex align-items-center" href="/">
                 <img src=/static/logo.png alt=Bootstrap width=40 height=40 class="d-inline-block align-text-top"><span
-                    style="margin-left: 10px;" class="navbar-brand mb-0 h1">TechZ Index</span></a>
+                    style="margin-left: 10px;" class="navbar-brand mb-0 h1">TechZCloud</span></a>
         </div>
     </nav>
 
@@ -49,7 +49,7 @@
     <!-- Progress div -->
 
     <div id="udiv2-main" class="card m-5 text-center p-2" style="display: none;">
-        <h4>Uploading...</h4>
+        <h4 id="hstatus">Uploading...</h4>
         <div id="udiv-inner" class="card p-2 ">
             <table class="table">
                 <tbody>
@@ -77,6 +77,7 @@
             </div>
         </div>
     </div>
+
 
 
     <script>
@@ -116,7 +117,6 @@
             return text
         }
 
-
         const form = document.getElementById('upload-form');
         const fileInput = document.getElementById('file-input');
         const progressBar = document.getElementById('progressor');
@@ -126,6 +126,7 @@
         const vspeed = document.getElementById('vspeed');
         const udiv1 = document.getElementById('udiv-main');
         const udiv2 = document.getElementById('udiv2-main');
+        const hstatus = document.getElementById('hstatus');
 
         form.addEventListener('submit', e => {
             try {
@@ -134,8 +135,14 @@
                 const file = fileInput.files[0];
                 const formData = new FormData();
                 if (file) {
+                    if (file.size < 9 * 1024 * 1024) {
+                        alert("File size must be more than 10MB");
+                        return;
+                    }
+
                     udiv1.style.display = "none";
                     udiv2.style.display = "flex";
+
                     vfile.innerHTML = file.name;
                     vtime.innerHTML = "Calculating...";
                     vprog.innerHTML = "0%";
@@ -175,6 +182,73 @@
                         udiv2.style.display = "none";
                         alert('Error! Upload failed. Can\'t connect to server.');
                     };
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState == XMLHttpRequest.DONE) {
+                            hstatus.innerHTML = "Processing...";
+
+                            const fileHash = xhr.responseText;
+                            console.log(fileHash)
+                            udiv1.style.display = "none";
+                            udiv2.style.display = "flex";
+
+                            let isProc = true
+                            done = 1
+
+                            function updateProcess() {
+                                console.log("10 seconds");
+                                if (isProc) {
+                                    const xmlHttp = new XMLHttpRequest();
+                                    xmlHttp.open("GET", '/process/' + fileHash, true);
+                                    xmlHttp.send(null);
+                                    xmlHttp.onreadystatechange = function () {
+                                        if (xmlHttp.readyState == XMLHttpRequest.DONE) {
+                                            let data = xmlHttp.responseText;
+                                            console.log(data)
+
+                                            data = JSON.parse(data)
+
+                                            if (data['message']) {
+                                                isProc = false
+                                                clearInterval(interval);
+                                                console.log(data['message'])
+                                            }
+                                            const current = data['current']
+                                            const total = data['total']
+
+                                            speed = (current - done) / 5
+                                            tRemaining = formatTime((total - current) / speed)
+                                            speed = formatBytes(speed).toString() + "/s";
+
+                                            const percentComplete = Math.round((current / total) * 100);
+                                            progressBar.style.width = `${percentComplete}%`;
+                                            vprog.innerHTML = formatBytes(current) + "/" + formatBytes(total) + " | " + percentComplete + "%";
+                                            vtime.innerHTML = tRemaining;
+                                            vspeed.innerHTML = speed;
+
+                                            done = current
+                                            console.log(current / total)
+                                        }
+                                        if (xmlHttp.readyState == 4 && xmlHttp.status == 400) {
+                                            isProc = false
+                                            clearInterval(interval);
+                                            alert('Error! Upload failed. Can\'t connect to server.');
+                                        }
+                                    }
+
+
+
+                                }
+                                else {
+                                    clearInterval(interval);
+                                    console.log('done')
+                                }
+                                setTimeout(updateProcess, 1000);
+                            }
+
+                            setTimeout(updateProcess, 1000);
+
+                        }
+                    }
                 }
                 else {
                     alert('Select a file first');
