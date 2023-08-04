@@ -16,14 +16,14 @@ work_loads = {}  # {0: 0, 1: 0, 2: 0}
 
 async def media_streamer(request, message_id: int):
     global class_cache, multi_clients, work_loads
-    print(work_loads, multi_clients)
 
     range_header = request.headers.get("Range", 0)
 
     index = min(work_loads, key=work_loads.get)
     faster_client = multi_clients[index]
 
-    logger.info(f"Client {index} is now serving the request for message {message_id}")
+    logger.info(
+        f"Client {index} is now serving the request for message {message_id}")
 
     if faster_client in class_cache:
         tg_connect = class_cache[faster_client]
@@ -61,7 +61,8 @@ async def media_streamer(request, message_id: int):
     last_part_cut = until_bytes % chunk_size + 1
 
     req_length = until_bytes - from_bytes + 1
-    part_count = math.ceil(until_bytes / chunk_size) - math.floor(offset / chunk_size)
+    part_count = math.ceil(until_bytes / chunk_size) - \
+        math.floor(offset / chunk_size)
     body = tg_connect.yield_file(
         file_id,
         index,
@@ -78,7 +79,8 @@ async def media_streamer(request, message_id: int):
     disposition = "attachment"
 
     if not mime_type:
-        mime_type = mimetypes.guess_type(file_name)[0] or "application/octet-stream"
+        mime_type = mimetypes.guess_type(
+            file_name)[0] or "application/octet-stream"
 
     if "video/" in mime_type or "audio/" in mime_type or "/html" in mime_type:
         disposition = "inline"

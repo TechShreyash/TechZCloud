@@ -122,6 +122,7 @@ UPLOAD_TASK = []
 
 
 async def upload_task_spawner():
+    print("Task Spawner Started")
     global UPLOAD_TASK
     while True:
         if len(UPLOAD_TASK) > 0:
@@ -150,13 +151,14 @@ async def generate_clients():
         print(f"Client {i} generated")
 
 
-async def starta():
-    await asyncio.gather(generate_clients(), upload_task_spawner())
+async def start_server():
+    loop.create_task(upload_task_spawner())
 
+    await generate_clients()
 
-def start():
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(starta())
+    await server.setup()
+    await web.TCPSite(server).start()
+    await idle()
 
 
 if __name__ == "__main__":
@@ -169,5 +171,6 @@ if __name__ == "__main__":
     app.router.add_post("/upload", upload_file)
     app.router.add_get("/process/{hash}", process)
 
-    threading.Thread(target=web.run_app,daemon=True,args=(app,)).start()
-    start()
+    loop = asyncio.get_event_loop()
+    server = web.AppRunner(app)
+    loop.run_until_complete(start_server())
