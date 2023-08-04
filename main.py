@@ -160,9 +160,6 @@ def start():
 
 if __name__ == "__main__":
     delete_cache()
-    loop = asyncio.get_event_loop()
-    asyncio.ensure_future(generate_clients())
-    loop.create_task(upload_task_spawner())
 
     app.router.add_get("/", home)
     app.router.add_get("/static/{file}", static_files)
