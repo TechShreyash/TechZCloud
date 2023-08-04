@@ -2,41 +2,39 @@ import threading
 from pyrogram import Client
 import time
 import os
+import asyncio
+
+from utils.db import save_file_in_db
 
 PROGRESS = {}
+from utils.tgstreamer import work_loads, multi_clients
 
 
-def start_processing(app, hash, filename, extension):
-    thread = threading.Thread(
-        target=upload_file_to_channel,
-        args=(
-            app,
-            hash,
-            filename,
-            extension,
-        ),
-        daemon=True,
-    )
-    thread.start()
+async def upload_file_to_channel(hash, filename, extension):
+    global PROGRESS, multi_clients, work_loads
 
+    index = min(work_loads, key=work_loads.get)
+    app = multi_clients[index]
+    work_loads[index] += 1
 
-def upload_file_to_channel(app: Client, hash, filename, extension):
-    global PROGRESS
     print("Uploading file to channel")
     PROGRESS[hash] = {}
-    file = app.send_document(
+    file = await app.send_document(
         -1001901516995,
         f"static/uploads/{hash}.{extension}",
         caption=f"{hash} | {filename}",
         progress=upload_progress,
         progress_args=(hash,),
     )
+    save_file_in_db(filename, hash, file.id)
+    work_loads[index] -= 1
+
     PROGRESS[hash]["message"] = file.id
     print("Uploaded file to channel")
     os.remove(f"static/uploads/{hash}.{extension}")
 
 
-def upload_progress(current, total, hash):
+async def upload_progress(current, total, hash):
     global PROGRESS
     t1 = PROGRESS[hash].get("t1", 1)
 

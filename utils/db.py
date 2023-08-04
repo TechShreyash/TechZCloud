@@ -8,9 +8,19 @@ db = client["techzcloud"]
 filesdb = db["files"]
 
 
-def save_file_in_db(filename, hash):
-    filesdb.insert_one({"filename": filename, "hash": hash})
+def save_file_in_db(filename, hash, msg_id=None):
+    filesdb.update_one(
+        {
+            "hash": hash,
+        },
+        {"$set": {"filename": filename, "msg_id": msg_id}},
+        upsert=True,
+    )
 
 
 def is_hash_in_db(hash):
-    return filesdb.find_one({"hash": hash}) is not None
+    data = filesdb.find_one({"hash": hash})
+    if data:
+        return data
+    else:
+        return None

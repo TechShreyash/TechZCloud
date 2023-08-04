@@ -1,5 +1,4 @@
-flask
-gunicorn
+aiohttp
 pyrogram
 pymongo
 tgcrypto
