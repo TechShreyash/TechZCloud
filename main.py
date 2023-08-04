@@ -1,3 +1,4 @@
+from config import *
 import threading
 from utils.tgstreamer import work_loads, multi_clients
 import asyncio
@@ -136,11 +137,7 @@ async def generate_clients():
 
     print("Generating Clients")
 
-    multi_clients[0] = bot0
-    work_loads[0] = 0
-    print("Client 0 generated")
-
-    for i in range(1, len(BOT_TOKENS)):
+    for i in range(len(BOT_TOKENS)):
         bot = Client(
             f"bot{i}",
             api_id=API_KEY,
@@ -153,20 +150,19 @@ async def generate_clients():
         print(f"Client {i} generated")
 
 
-from config import *
+async def starta():
+    await asyncio.gather(generate_clients(), upload_task_spawner())
+
+
+def start():
+    asyncio.run(starta())
+
 
 if __name__ == "__main__":
     delete_cache()
-    bot0 = Client(
-        "bot0",
-        api_id=API_KEY,
-        api_hash=API_HASH,
-        bot_token=BOT_TOKENS[0],
-    )
-    bot0.start()
     loop = asyncio.get_event_loop()
-    task = loop.create_task(generate_clients())
-    task = loop.create_task(upload_task_spawner())
+    asyncio.ensure_future(generate_clients())
+    loop.create_task(upload_task_spawner())
 
     app.router.add_get("/", home)
     app.router.add_get("/static/{file}", static_files)
@@ -175,6 +171,5 @@ if __name__ == "__main__":
     app.router.add_post("/upload", upload_file)
     app.router.add_get("/process/{hash}", process)
 
-    threading.Thread(target=web.run_app, args=(app,), daemon=True).start()
-    idle()
-    bot0.stop()
+    threading.Thread(target=start).start()
+    web.run_app(app)
