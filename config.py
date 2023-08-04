@@ -9,5 +9,5 @@ BOT_TOKENS = [
     "6067168936:AAGyKD_gQsZvuCgrbZFNs8wGsGnl9m1urVk",
     "6575542391:AAGJq8sWDFgJ7PxV9SduXXJXbg1bcfFwmWE",
     "6457414053:AAHNwDmTtdS5GMiaFNdztqYTs2ndNQ0iIMY",
-    "6596425608:AAG3Q064qScciTs-ijgf8dphDfD-f8vEyl8"
-][:1]
+    "6596425608:AAG3Q064qScciTs-ijgf8dphDfD-f8vEyl8",
+]
