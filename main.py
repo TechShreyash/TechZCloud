@@ -155,7 +155,8 @@ async def starta():
 
 
 def start():
-    asyncio.run(starta())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(starta())
 
 
 if __name__ == "__main__":
@@ -168,5 +169,5 @@ if __name__ == "__main__":
     app.router.add_post("/upload", upload_file)
     app.router.add_get("/process/{hash}", process)
 
-    threading.Thread(target=start).start()
-    web.run_app(app)
+    threading.Thread(target=web.run_app,daemon=True,args=(app,)).start()
+    start()
