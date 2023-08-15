@@ -93,7 +93,7 @@ async def remote_upload(request):
 
 async def file_html(request):
     hash = request.match_info["hash"]
-    download_link = f"https://legendary-adventure-9xgv956pvq627v9-8080.app.github.dev/dl/{hash}"
+    download_link = f"https://cloud.techzbots.live/dl/{hash}"
     filename = is_hash_in_db(hash)["filename"]
 
     return web.Response(

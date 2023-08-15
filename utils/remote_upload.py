@@ -4,4 +4,5 @@ from utils.upload import upload_file_to_channel
 
 async def start_remote_upload(session, hash, url):
     ext = await download_file(session, hash, url)
-    await upload_file_to_channel(hash, hash + ext, ext)
+    if ext:
+        await upload_file_to_channel(hash, hash + ext, ext)

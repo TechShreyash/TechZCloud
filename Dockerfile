@@ -1,12 +1,13 @@
-FROM python:3.10-alpine
-
-COPY ./requirements.txt /app/requirements.txt
+FROM python:3.11
 
 WORKDIR /app
 
-RUN pip install -r requirements.txt
+RUN apt update -y
+RUN apt-get install -y wget git
 
-COPY . /app
+COPY requirements.txt requirements.txt
+RUN pip3 install -U -r requirements.txt
 
+COPY start.sh start.sh
 
-CMD ["gunicorn","main.py"]
+CMD ["bash","start.sh"]
