@@ -93,7 +93,7 @@ async def remote_upload(request):
 
 async def file_html(request):
     hash = request.match_info["hash"]
-    download_link = f"http://64.227.157.55:8061/dl/{hash}"
+    download_link = f"https://legendary-adventure-9xgv956pvq627v9-8080.app.github.dev/dl/{hash}"
     filename = is_hash_in_db(hash)["filename"]
 
     return web.Response(
@@ -139,8 +139,8 @@ async def remote_status(request):
             data = {"current": data["done"], "total": data["total"]}
             return web.json_response(data)
 
-    # else:
-    #     return web.Response(text="Not Found", status=404, content_type="text/plain")
+    else:
+        return web.Response(text="Not Found", status=404, content_type="text/plain")
 
 
 async def download(request: web.Request):
