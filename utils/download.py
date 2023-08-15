@@ -12,16 +12,16 @@ async def download_file(session, hash, url):
         if response.content_length:
             total = response.content_length
         else:
-            DL_STATUS = {"message": "Unable to get file size"}
+            DL_STATUS[hash] = {"message": "Unable to get file size"}
             print("Unable to get file size")
             return
 
         if total > 1.9 * 1024 * 1024 * 1024:
-            DL_STATUS = {"message": "File size greater than 2GB is not allowed"}
+            DL_STATUS[hash] = {"message": "File size greater than 2GB is not allowed"}
             print("File size too big")
             return
         if total < 9.9 * 1024 * 1024:
-            DL_STATUS = {"message": "File size lest than 10MB is not allowed"}
+            DL_STATUS[hash] = {"message": "File size lest than 10MB is not allowed"}
             print("File size too small")
             return
 
@@ -32,13 +32,13 @@ async def download_file(session, hash, url):
         elif headers.get("content-type"):
             type = headers.get("content-type")
         else:
-            DL_STATUS = {"message": "Unable to get file type"}
+            DL_STATUS[hash] = {"message": "Unable to get file type"}
             print("Unable to get file type")
             return
 
         ext = mimetypes.guess_extension(type)
         if not ext:
-            DL_STATUS = {"message": "Unable to get file extension"}
+            DL_STATUS[hash] = {"message": "Unable to get file extension"}
             print("Unable to get file extension")
             return
         else:
