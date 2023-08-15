@@ -36,7 +36,10 @@ async def download_file(session, hash, url):
             print("Unable to get file type")
             return
 
-        ext = mimetypes.guess_extension(type)
+        if type == "video/x-matroska":
+            ext = "mkv"
+        else:
+            ext = mimetypes.guess_extension(type)
         if not ext:
             DL_STATUS[hash] = {"message": "Unable to get file extension"}
             print("Unable to get file extension")

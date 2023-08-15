@@ -76,6 +76,9 @@ async def upload_file(request):
 async def home(_):
     return web.Response(text=render_template("index.html"), content_type="text/html")
 
+async def bot_status(_):
+    json = work_loads
+    return web.json_response(json)
 
 async def remote_upload(request):
     global aiosession
@@ -196,6 +199,7 @@ async def start_server():
     app.router.add_get("/process/{hash}", process)
     app.router.add_post("/remote_upload", remote_upload)
     app.router.add_get("/remote_status/{hash}", remote_status)
+    app.router.add_get("/bot_status", bot_status)
 
     aiosession = aiohttp.ClientSession()
     server = web.AppRunner(app)
