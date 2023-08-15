@@ -90,9 +90,9 @@ function FileUploader(file) {
     };
 
     xhr.onerror = (e) => {
+        alert("Error! Upload failed. Can't connect to server.");
         udiv1.style.display = "flex";
         udiv2.style.display = "none";
-        alert("Error! Upload failed. Can't connect to server.");
         return;
     };
 
@@ -151,9 +151,9 @@ function TgFileUploader(fileHash) {
                 }
                 if (xmlHttp.readyState == 4 && xmlHttp.status == 400) {
                     isProc = false;
+                    alert("Error! Upload failed. Can't connect to server.");
                     udiv1.style.display = "flex";
                     udiv2.style.display = "none";
-                    alert("Error! Upload failed. Can't connect to server.");
                     return;
                 }
             };
@@ -281,9 +281,9 @@ form.addEventListener("submit", (e) => {
         }
 
     } catch (err) {
+        alert(err);
         udiv1.style.display = "flex";
         udiv2.style.display = "none";
-        alert(err);
         return;
     }
 });
