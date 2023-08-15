@@ -1,0 +1,40 @@
+.progress-bar {
+  width: 100%;
+  height: 20px;
+  background-color: #ddd;
+}
+
+#progressor {
+  width: 0%;
+  height: 100%;
+  background-color: #00c9a7;
+}
+
+#udiv-main {
+  background-color: #2c73d2;
+}
+#udiv2-main {
+  background-color: #00a388;
+}
+
+#udiv-inner {
+  background-color: white;
+}
+
+body {
+  background-color: #e4f0f5;
+}
+
+.navbar {
+  background-color: #2c73d2;
+}
+
+#udiv-main h4,
+#udiv2-main h4 {
+  color: white;
+}
+
+.form-group {
+  text-align: left;
+  margin: 5px 0px;
+}

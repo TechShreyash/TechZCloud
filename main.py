@@ -1,8 +1,9 @@
+from utils.download import DL_STATUS
+import aiohttp
 from config import *
-import threading
+from utils.remote_upload import start_remote_upload
 from utils.tgstreamer import work_loads, multi_clients
 import asyncio
-import json
 from pyrogram import Client, idle
 from werkzeug.utils import secure_filename
 import os
@@ -41,10 +42,10 @@ async def upload_file(request):
 
         filename = secure_filename(filename)
         extension = filename.rsplit(".", 1)[1]
-        hash = get_file_hash(extension)
+        hash = get_file_hash()
 
         while is_hash_in_db(hash):
-            hash = get_file_hash(filename.rsplit(".", 1)[1])
+            hash = get_file_hash()
             print(hash)
 
         try:
@@ -73,7 +74,21 @@ async def upload_file(request):
 
 
 async def home(_):
-    return web.Response(text=render_template("minhome.html"), content_type="text/html")
+    return web.Response(text=render_template("index.html"), content_type="text/html")
+
+
+async def remote_upload(request):
+    global aiosession
+    hash = get_file_hash()
+    print(request.headers)
+    link = request.headers["url"]
+
+    while is_hash_in_db(hash):
+        hash = get_file_hash()
+
+    print("Remote upload", hash)
+    loop.create_task(start_remote_upload(aiosession, hash, link))
+    return web.Response(text=hash, content_type="text/plain", status=200)
 
 
 async def file_html(request):
@@ -82,7 +97,7 @@ async def file_html(request):
     filename = is_hash_in_db(hash)["filename"]
 
     return web.Response(
-        text=render_template("minfile.html")
+        text=render_template("file.html")
         .replace("FILE_NAME", filename)
         .replace("DOWNLOAD_LINK", download_link),
         content_type="text/html",
@@ -110,6 +125,24 @@ async def process(request):
         return web.Response(text="Not Found", status=404, content_type="text/plain")
 
 
+async def remote_status(request):
+    global DL_STATUS
+    print(DL_STATUS)
+    hash = request.match_info["hash"]
+
+    data = DL_STATUS.get(hash)
+    if data:
+        if data.get("message"):
+            data = {"message": data["message"]}
+            return web.json_response(data)
+        else:
+            data = {"current": data["done"], "total": data["total"]}
+            return web.json_response(data)
+
+    # else:
+    #     return web.Response(text="Not Found", status=404, content_type="text/plain")
+
+
 async def download(request: web.Request):
     hash = request.match_info["hash"]
     id = is_hash_in_db(hash)
@@ -127,7 +160,6 @@ async def upload_task_spawner():
     while True:
         if len(UPLOAD_TASK) > 0:
             task = UPLOAD_TASK.pop(0)
-            loop = asyncio.get_event_loop()
             loop.create_task(upload_file_to_channel(*task))
             print("Task created", task)
         await asyncio.sleep(1)
@@ -152,16 +184,8 @@ async def generate_clients():
 
 
 async def start_server():
-    loop.create_task(upload_task_spawner())
-
-    await generate_clients()
-
-    await server.setup()
-    await web.TCPSite(server).start()
-    await idle()
-
-
-if __name__ == "__main__":
+    global aiosession
+    print("Starting Server")
     delete_cache()
 
     app.router.add_get("/", home)
@@ -170,7 +194,23 @@ if __name__ == "__main__":
     app.router.add_get("/file/{hash}", file_html)
     app.router.add_post("/upload", upload_file)
     app.router.add_get("/process/{hash}", process)
+    app.router.add_post("/remote_upload", remote_upload)
+    app.router.add_get("/remote_status/{hash}", remote_status)
 
-    loop = asyncio.get_event_loop()
+    aiosession = aiohttp.ClientSession()
     server = web.AppRunner(app)
+
+    print("Starting Upload Task Spawner")
+    loop.create_task(upload_task_spawner())
+    print("Starting Client Generator")
+    loop.create_task(generate_clients())
+
+    await server.setup()
+    print("Server Started")
+    await web.TCPSite(server).start()
+    await idle()
+
+
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
     loop.run_until_complete(start_server())

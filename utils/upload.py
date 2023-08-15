@@ -1,3 +1,4 @@
+from utils.tgstreamer import work_loads, multi_clients
 import threading
 from pyrogram import Client
 import time
@@ -7,7 +8,6 @@ import asyncio
 from utils.db import save_file_in_db
 
 PROGRESS = {}
-from utils.tgstreamer import work_loads, multi_clients
 
 
 async def upload_file_to_channel(hash, filename, extension):

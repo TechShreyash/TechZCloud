@@ -1,6 +1,10 @@
 import os
 
 for i in os.listdir("templates"):
+    if i.startswith("min"):
+        os.remove(f"templates/{i}")
+        continue
+    
     with open(f"templates/{i}") as f:
         text = f.read()
 

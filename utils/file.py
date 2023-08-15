@@ -31,13 +31,16 @@ from string import ascii_letters, digits
 import os, random
 
 
-def get_file_hash(extension):
+def get_file_hash():
     while True:
         hash = "".join([random.choice(ascii_letters + digits) for n in range(10)])
-        if not os.path.exists(f"static/uploads/{hash}.{extension}"):
-            return hash
+        for i in os.listdir("static/uploads"):
+            if i.startswith(hash):
+                continue
+        return hash
+
 
 def delete_cache():
     for file in os.listdir("static/uploads"):
-        if file != 'exists.txt':
+        if file != "exists.txt":
             os.remove(f"static/uploads/{file}")
