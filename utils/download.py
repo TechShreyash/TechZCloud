@@ -13,7 +13,7 @@ async def download_file(session, hash, url):
             total = response.content_length
         else:
             DL_STATUS = {"message": "Unable to get file size"}
-            print('Unable to get file size')
+            print("Unable to get file size")
             return
 
         headers = response.headers
@@ -24,14 +24,16 @@ async def download_file(session, hash, url):
             type = headers.get("content-type")
         else:
             DL_STATUS = {"message": "Unable to get file type"}
-            print('Unable to get file type')
+            print("Unable to get file type")
             return
 
         ext = mimetypes.guess_extension(type)
         if not ext:
             DL_STATUS = {"message": "Unable to get file extension"}
-            print('Unable to get file extension')
+            print("Unable to get file extension")
             return
+        else:
+            ext = ext.lower().strip(" .")
 
         done = 0
         async with aiofiles.open("static/uploads/" + hash + ".temp", "wb") as f:
@@ -45,11 +47,11 @@ async def download_file(session, hash, url):
                 await f.write(data)
 
         async with aiofiles.open("static/uploads/" + hash + ".temp", "rb") as f:
-            async with aiofiles.open("static/uploads/" + hash + ext, "wb") as f2:
+            async with aiofiles.open("static/uploads/" + hash + "." + ext, "wb") as f2:
                 await f2.write(await f.read())
 
         DL_STATUS[hash] = {"message": "complete"}
-        return ext.strip(' .')
+        return ext
 
 
 # import asyncio, aiohttp
