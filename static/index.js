@@ -198,7 +198,7 @@ function RemoteUploader(url) {
                             }
                             if (data["message"]) {
                                 isProc = false;
-                                alert("Error! Upload failed. Can't connect to server.");
+                                alert(data["message"]);
                                 return
                             }
                             const current = data["current"];

@@ -16,6 +16,15 @@ async def download_file(session, hash, url):
             print("Unable to get file size")
             return
 
+        if total > 1.9 * 1024 * 1024 * 1024:
+            DL_STATUS = {"message": "File size greater than 2GB is not allowed"}
+            print("File size too big")
+            return
+        if total < 9.9 * 1024 * 1024:
+            DL_STATUS = {"message": "File size lest than 10MB is not allowed"}
+            print("File size too small")
+            return
+
         headers = response.headers
         if headers.get("Content-Type"):
             type = headers.get("Content-Type")
