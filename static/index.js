@@ -168,15 +168,15 @@ function TgFileUploader(fileHash) {
 function RemoteUploader(url) {
     const xhr = new XMLHttpRequest();
     xhr.open("POST", "/remote_upload", true);
-    xhr.setRequestHeader('url', url)
-    xhr.send(null)
+    xhr.setRequestHeader("url", url);
+    xhr.send(null);
 
     xhr.onreadystatechange = function () {
         if (xhr.readyState == XMLHttpRequest.DONE) {
             hstatus.innerHTML = "Uploading...";
             // downloading file from remote to server
             const fileHash = xhr.responseText;
-            vfile.innerHTML = fileHash + '.temp';
+            vfile.innerHTML = fileHash + ".temp";
             udiv1.style.display = "none";
             udiv2.style.display = "flex";
 
@@ -195,15 +195,15 @@ function RemoteUploader(url) {
 
                             if (data["message"] == "complete") {
                                 isProc = false;
-                                TgFileUploader(fileHash)
-                                return
+                                TgFileUploader(fileHash);
+                                return;
                             }
                             if (data["message"]) {
                                 isProc = false;
                                 alert(data["message"]);
                                 udiv1.style.display = "flex";
                                 udiv2.style.display = "none";
-                                return
+                                return;
                             }
                             const current = data["current"];
                             const total = data["total"];
@@ -212,9 +212,7 @@ function RemoteUploader(url) {
                             tRemaining = formatTime((total - current) / speed);
                             speed = formatBytes(speed).toString() + "/s";
 
-                            const percentComplete = Math.round(
-                                (current / total) * 100
-                            );
+                            const percentComplete = Math.round((current / total) * 100);
                             progressBar.style.width = `${percentComplete}%`;
                             vprog.innerHTML =
                                 formatBytes(current) +
@@ -247,7 +245,7 @@ function RemoteUploader(url) {
     };
 }
 
-// submit button handler 
+// submit button handler
 
 form.addEventListener("submit", (e) => {
     try {
@@ -266,20 +264,17 @@ form.addEventListener("submit", (e) => {
             }
 
             FileUploader(file);
-
         } else if (url) {
             if (url.trim() != "") {
                 console.log(url);
                 url = url.trim();
 
-                RemoteUploader(url)
+                RemoteUploader(url);
             }
-        }
-        else {
+        } else {
             alert("Select a File or enter a URL");
             return;
         }
-
     } catch (err) {
         alert(err);
         udiv1.style.display = "flex";

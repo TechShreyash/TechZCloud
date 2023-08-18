@@ -74,7 +74,7 @@ async def upload_file(request):
 
 
 async def home(_):
-    return web.Response(text=render_template("index.html"), content_type="text/html")
+    return web.Response(text=render_template("minindex.html"), content_type="text/html")
 
 async def bot_status(_):
     json = work_loads
@@ -100,7 +100,7 @@ async def file_html(request):
     filename = is_hash_in_db(hash)["filename"]
 
     return web.Response(
-        text=render_template("file.html")
+        text=render_template("minfile.html")
         .replace("FILE_NAME", filename)
         .replace("DOWNLOAD_LINK", download_link),
         content_type="text/html",
